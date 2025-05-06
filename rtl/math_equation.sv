@@ -63,7 +63,7 @@ module math_equation
     always_ff @(posedge clk) begin
         if (valid_0) begin
             res_1_0 <= $signed(res_0) * $signed(sub_0);
-            res_1_1 <= $signed(d_delayed) <<< 2;
+            res_1_1 <= $signed(d_delayed) * $signed(4'd4);
         end
     end
 
