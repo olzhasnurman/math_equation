@@ -1,5 +1,4 @@
 import os
-import sys
 
 VERILATE_COMMAND_TRACE = "verilator --assert -I./rtl/ --Wall --trace --cc ./rtl/math_equation.sv --exe test/tb_math_equation.cpp"
 MAKE_COMMAND = "make -C obj_dir -f Vmath_equation.mk"
