@@ -27,7 +27,7 @@ module math_equation
 
     // Stage 0.
     logic signed [WIDTH + 2:0] res_0; // because unsigned 3 needs to be represented as 2-bit binary 11 and adding 1 requires another bit to prevent overflow. So width is WIDTH + 3.
-    logic signed [WIDTH    :0] sub_0;
+    logic signed [WIDTH    :0] sub_0; // Width increases by one.
     logic signed [WIDTH - 1:0] d_delayed;
 
     // Stage 1.
@@ -70,7 +70,7 @@ module math_equation
     // Results. Stage 2.
     always_ff @(posedge clk) begin
         if (valid_1) begin
-            q <= (($signed(res_1_0) - $signed(res_1_1)) >>> 1);
+            q <= (($signed(res_1_0) - $signed(res_1_1)) / 2);
         end
     end
 
