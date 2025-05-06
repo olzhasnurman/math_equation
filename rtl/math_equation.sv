@@ -5,19 +5,19 @@ module math_equation
 )
 (
     // Common clock & reset.
-    input  logic                 clk,
-    input  logic                 rst,
+    input  logic                        clk,
+    input  logic                        rst,
 
     // Inputs.
-    input  logic                 valid_i, 
-    input  logic [WIDTH   - 1:0] a,
-    input  logic [WIDTH   - 1:0] b,
-    input  logic [WIDTH   - 1:0] c,
-    input  logic [WIDTH   - 1:0] d,
+    input  logic                        valid_i, 
+    input  logic signed [WIDTH   - 1:0] a,
+    input  logic signed [WIDTH   - 1:0] b,
+    input  logic signed [WIDTH   - 1:0] c,
+    input  logic signed [WIDTH   - 1:0] d,
 
     // Output.
-    output logic                 valid_o,
-    output logic [2*WIDTH + 1:0] q
+    output logic                        valid_o,
+    output logic signed [2*WIDTH + 1:0] q
 );
     // Internal nets.
     
@@ -26,13 +26,13 @@ module math_equation
     logic valid_1;
 
     // Stage 0.
-    logic [WIDTH + 2:0] res_0; // because unsigned 3 needs to be represented as 2-bit binary 11 and adding 1 requires another bit to prevent overflow. So width is WIDTH + 3.
-    logic [WIDTH - 1:0] sub_0;
-    logic [WIDTH - 1:0] d_delayed;
+    logic signed [WIDTH + 2:0] res_0; // because unsigned 3 needs to be represented as 2-bit binary 11 and adding 1 requires another bit to prevent overflow. So width is WIDTH + 3.
+    logic signed [WIDTH - 1:0] sub_0;
+    logic signed [WIDTH - 1:0] d_delayed;
 
     // Stage 1.
-    logic [2*WIDTH + 2:0] res_1_0; // Requires bit-width of  2*WIDTH + 3.
-    logic [  WIDTH + 1:0] res_1_1; // WIDTH + 2.
+    logic signed [2*WIDTH + 2:0] res_1_0; // Requires bit-width of  2*WIDTH + 3.
+    logic signed [  WIDTH + 1:0] res_1_1; // WIDTH + 2.
 
     
     // Valids.
@@ -53,7 +53,7 @@ module math_equation
     // Stage 0.
     always_ff @(posedge clk) begin
         if (valid_i) begin
-            res_0     <= 1 + ($unsigned(2'd3) * $signed(c));
+            res_0     <= 1 + ((2'd3) * c);
             sub_0     <= a - b;
             d_delayed <= d;
         end
@@ -62,15 +62,15 @@ module math_equation
     // Stage 1.
     always_ff @(posedge clk) begin
         if (valid_0) begin
-            res_1_0 <= $signed(res_0) * $signed(sub_0);
-            res_1_1 <= $signed({{2{d_delayed[WIDTH - 1]}}, d_delayed}) <<< 2;
+            res_1_0 <= res_0 * sub_0;
+            res_1_1 <= {{2{d_delayed[WIDTH - 1]}}, d_delayed} <<< 2;
         end
     end
 
     // Results. Stage 2.
     always_ff @(posedge clk) begin
         if (valid_1) begin
-            q <= ($signed($signed(res_1_0) - $signed(res_1_1)) >>> 1);
+            q <= ($signed(res_1_0 - res_1_1) >>> 1);
         end
     end
 
